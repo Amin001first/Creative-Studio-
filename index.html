@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creative Studio · Free AI Writing</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #2a1548 0%, #0f0a1a 60%);
+    min-height: 100vh;
+    color: #ede4f7;
+    padding: 1rem;
+    -webkit-text-size-adjust: 100%;
+}
+.app { max-width: 800px; margin: 0 auto; }
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+    padding: 0.3rem;
+}
+.logo {
+    font-size: 1.3rem;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.logo .mark {
+    width: 36px; height: 36px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 6px 18px rgba(168,85,247,0.4);
+}
+.logo b {
+    font-weight: 600;
+    background: linear-gradient(135deg, #d8b4fe, #f9a8d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Welcome banner */
+.welcome {
+    background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.12));
+    border: 1px solid #6b3a9e;
+    border-radius: 1rem;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: #e0cfff;
+}
+.welcome h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #f0dcff;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.welcome a {
+    color: #f9a8d4;
+    text-decoration: underline;
+    font-weight: 500;
+    word-break: break-word;
+}
+.welcome .steps {
+    margin-top: 0.6rem;
+    padding-left: 1.1rem;
+    font-size: 0.85rem;
+}
+.welcome .steps li { margin-bottom: 0.25rem; }
+.welcome .close {
+    float: right;
+    background: transparent;
+    border: none;
+    color: #a896bf;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 0.3rem;
+    font-family: inherit;
+}
+.welcome .close:hover { color: #f0dcff; }
+.welcome.hidden { display: none; }
+
+.key-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+    background: rgba(30,18,48,0.75);
+    border: 1px solid #4a2c6b;
+    border-radius: 100px;
+    padding: 0.4rem 0.4rem 0.4rem 1rem;
+    margin-bottom: 1rem;
+}
+.key-row input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    color: #ede4f7;
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+    outline: none;
+    padding: 0.4rem 0;
+}
+.key-row input::placeholder { color: #a896bf; }
+.key-badge {
+    background: #3b1d4d;
+    color: #d8b4fe;
+    padding: 0.4rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid #5e3a7a;
+}
+.key-badge.ok { background: #14351f; color: #86efac; border-color: #2d6a3f; }
+
+.tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+    background: rgba(30,18,48,0.75);
+    border: 1px solid #4a2c6b;
+    color: #a896bf;
+    padding: 0.6rem 1.1rem;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.tab.active {
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(168,85,247,0.4);
+}
+
+.panel {
+    background: rgba(30,18,48,0.75);
+    border: 1px solid #4a2c6b;
+    border-radius: 1.2rem;
+    padding: 1.1rem;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+}
+.panel h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #d8b4fe;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.field { margin-bottom: 0.8rem; }
+.field label {
+    display: block;
+    font-size: 0.72rem;
+    color: #a896bf;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.35rem;
+}
+.field input, .field select, .field textarea {
+    width: 100%;
+    background: #14091f;
+    border: 1px solid #4a2c6b;
+    border-radius: 0.8rem;
+    padding: 0.75rem 0.9rem;
+    color: #ede4f7;
+    font-size: 0.92rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+}
+.field textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+.field input:focus, .field select:focus, .field textarea:focus {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168,85,247,0.15);
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+.chip {
+    background: #2a1548;
+    border: 1px solid #4a2c6b;
+    color: #c9b3e0;
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    user-select: none;
+    font-family: inherit;
+}
+.chip:active { background: #3b1d5c; color: #f0e0ff; }
+
+.btn {
+    background: #2a1548;
+    border: 1px solid #4a2c6b;
+    border-radius: 100px;
+    padding: 0.75rem 1.3rem;
+    color: #ede4f7;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-family: inherit;
+    flex: 1;
+    min-width: 100px;
+}
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.primary {
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(168,85,247,0.35);
+    flex: 2;
+}
+.btn.ghost { background: transparent; color: #a896bf; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+
+.output {
+    background: #14091f;
+    border: 1px solid #4a2c6b;
+    border-radius: 1rem;
+    padding: 1rem 1.1rem;
+    min-height: 200px;
+    max-height: 55vh;
+    overflow-y: auto;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: Georgia, serif;
+    color: #ede4f7;
+    -webkit-overflow-scrolling: touch;
+}
+.output:empty::before {
+    content: attr(data-placeholder);
+    color: #6b5b85;
+    font-style: italic;
+    font-family: inherit;
+    font-size: 0.88rem;
+}
+.output.loading::after {
+    content: "⚡ generating…";
+    display: block;
+    color: #d8b4fe;
+    font-family: inherit;
+    font-size: 0.82rem;
+    margin-top: 0.6rem;
+    animation: pulse 1.2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.err {
+    color: #fca5a5;
+    background: #3b1520;
+    padding: 0.65rem 1rem;
+    border-radius: 0.7rem;
+    font-size: 0.82rem;
+    border: 1px solid #7f1d3a;
+    display: none;
+    margin-top: 0.7rem;
+}
+.err.show { display: block; }
+.hint {
+    font-size: 0.72rem;
+    color: #a896bf;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.spinner {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="app">
+    <header>
+        <div class="logo">
+            <div class="mark">✦</div>
+            Creative <b>Studio</b>
+        </div>
+    </header>
+
+    <!-- First-time welcome banner -->
+    <div class="welcome" id="welcome">
+        <button class="close" id="closeWelcome" aria-label="Close">×</button>
+        <h3>👋 First time here?</h3>
+        It's free — you just need your own Gemini API key (30 seconds to get, no credit card).
+        <ol class="steps">
+            <li>Open <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a></li>
+            <li>Sign in with any Google account</li>
+            <li>Click <b>"Create API key"</b> and copy it</li>
+            <li>Paste it into the field below — it stays on your device only</li>
+        </ol>
+    </div>
+
+    <div class="key-row">
+        <input type="password" id="apiKey" placeholder="Paste Gemini API key here (AIza...)" autocomplete="off" spellcheck="false">
+        <span class="key-badge" id="keyBadge">no key</span>
+    </div>
+
+    <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="story">📖 Story</button>
+        <button class="tab" data-tab="poem">🎭 Poem</button>
+        <button class="tab" data-tab="character">🧑 Character</button>
+        <button class="tab" data-tab="dialogue">💬 Dialogue</button>
+        <button class="tab" data-tab="world">🌍 World</button>
+        <button class="tab" data-tab="song">🎵 Song</button>
+        <button class="tab" data-tab="script">🎬 Script</button>
+        <button class="tab" data-tab="idea">💡 Ideas</button>
+        <button class="tab" data-tab="rewrite">✏️ Rewrite</button>
+    </div>
+
+    <div class="panel" id="inputPanel"></div>
+
+    <div class="panel">
+        <h2>📄 Output</h2>
+        <div class="output" id="output" data-placeholder="Your generated content will appear here…"></div>
+        <div class="hint">
+            <span id="hintText">ready</span>
+            <span id="wordCount"></span>
+        </div>
+        <div class="err" id="err"></div>
+        <div class="btn-row">
+            <button class="btn ghost" id="copyBtn">📋 Copy</button>
+            <button class="btn ghost" id="clearBtn">🗑️ Clear</button>
+            <button class="btn ghost" id="shareBtn">📤 Share</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
+    const MODEL = 'gemini-1.5-flash-latest';
+
+    let currentTab = 'story';
+    let busy = false;
+    let lastOutput = '';
+
+    const apiKeyEl = document.getElementById('apiKey');
+    const keyBadge = document.getElementById('keyBadge');
+    const tabsEl = document.getElementById('tabs');
+    const inputPanel = document.getElementById('inputPanel');
+    const output = document.getElementById('output');
+    const errEl = document.getElementById('err');
+    const hintText = document.getElementById('hintText');
+    const wordCount = document.getElementById('wordCount');
+    const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const welcome = document.getElementById('welcome');
+    const closeWelcome = document.getElementById('closeWelcome');
+
+    // Show welcome banner unless user has dismissed it before
+    try {
+        if (localStorage.getItem('welcome_dismissed') === '1') {
+            welcome.classList.add('hidden');
+        }
+    } catch(e){}
+
+    closeWelcome.addEventListener('click', () => {
+        welcome.classList.add('hidden');
+        try { localStorage.setItem('welcome_dismissed', '1'); } catch(e){}
+    });
+
+    // If user has a saved key, don't show welcome
+    try {
+        const k = localStorage.getItem('gemini_key');
+        if (k) {
+            apiKeyEl.value = k;
+            welcome.classList.add('hidden');
+        }
+    } catch(e){}
+    updateBadge();
+
+    apiKeyEl.addEventListener('input', () => {
+        try { localStorage.setItem('gemini_key', apiKeyEl.value.trim()); } catch(e){}
+        updateBadge();
+    });
+
+    function updateBadge() {
+        const has = apiKeyEl.value.trim().length > 10;
+        keyBadge.textContent = has ? '✓ key set' : 'no key';
+        keyBadge.classList.toggle('ok', has);
+    }
+
+    function showErr(m){
+        errEl.textContent = '⚠️ ' + m;
+        errEl.classList.add('show');
+        clearTimeout(showErr._t);
+        showErr._t = setTimeout(() => errEl.classList.remove('show'), 9000);
+    }
+    function hideErr(){ errEl.classList.remove('show'); }
+    function setHint(t){ hintText.textContent = t; }
+    function updateWordCount(){
+        const words = lastOutput.split(/\s+/).filter(Boolean).length;
+        wordCount.textContent = words ? `${words} words` : '';
+    }
+
+    const TABS = {
+        story: {
+            title: '📖 Story Writer',
+            fields: [
+                { id: 'premise', type: 'textarea', label: 'Premise', placeholder: 'A rain-soaked Parisian apartment, two strangers…',
+                  default: 'A rain-soaked Parisian apartment, two strangers, a night that changes everything.' },
+                { id: 'genre', type: 'select', label: 'Genre', options: ['Literary','Romance','Erotic Romance','Fantasy','Sci-Fi','Mystery','Horror','Thriller','Historical'] },
+                { id: 'tone', type: 'select', label: 'Tone', options: ['Sensual & Poetic','Dark & Intense','Playful & Witty','Melancholic','Hopeful','Sultry','Dreamy','Raw'] },
+                { id: 'length', type: 'select', label: 'Length', options: ['Short (2–3 paragraphs)','Medium (4–6 paragraphs)','Long (7–10 paragraphs)'] },
+            ],
+            chips: [
+                { label: '🕯️ candlelit bath', fill: { premise: 'A slow, teasing encounter in a candlelit bath, whispered promises, gentle touches.', tone: 'Sensual & Poetic', genre: 'Erotic Romance' } },
+                { label: '🎭 masquerade', fill: { premise: 'A masquerade ball, hidden identities, a stranger\'s hand on your waist, moonlit balcony.', genre: 'Romance', tone: 'Dreamy' } },
+                { label: '🏢 office after hours', fill: { premise: 'Modern office, late night, a storm outside, the only two people left in the building.', genre: 'Romance', tone: 'Sultry' } },
+                { label: '🌅 secluded beach', fill: { premise: 'A secluded beach at sunset, warm sand, waves, a slow tender embrace.', tone: 'Sensual & Poetic' } },
+                { label: '⚔️ enemies to lovers', fill: { premise: 'Two rival warriors forced to share a tent on a cold campaign night.', genre: 'Fantasy', tone: 'Dark & Intense' } },
+            ],
+            build: (v) => `You are an acclaimed novelist. Write immersive, literary prose in the ${v.genre} genre with a ${v.tone} tone. Length: ${v.length}. Focus on sensory detail, emotional tension, and poetic description. Output ONLY the story prose — no headings, no commentary, no surrounding quotation marks.\n\nStory direction: "${v.premise}"`
+        },
+        poem: {
+            title: '🎭 Poem',
+            fields: [
+                { id: 'topic', type: 'textarea', label: 'Theme', default: 'Longing across distance, the ache of a memory that won\'t fade.' },
+                { id: 'form', type: 'select', label: 'Form', options: ['Free Verse','Sonnet','Haiku Sequence','Villanelle','Blank Verse','Prose Poem','Sestina','Ballad'] },
+                { id: 'voice', type: 'select', label: 'Voice', options: ['First Person','Second Person','Third Person','Omniscient'] },
+                { id: 'mood', type: 'select', label: 'Mood', options: ['Yearning','Wistful','Passionate','Melancholic','Hopeful','Dreamlike','Fierce'] },
+            ],
+            chips: [
+                { label: '🌙 moonlit longing', fill: { topic: 'A lover watching the moon, thinking of someone far away.', mood: 'Yearning' } },
+                { label: '🔥 burning desire', fill: { topic: 'The first touch after years apart.', mood: 'Passionate' } },
+                { label: '🍂 autumn memory', fill: { topic: 'A memory of a past love, golden and gone.', mood: 'Wistful' } },
+                { label: '🌊 the sea', fill: { topic: 'The sea as a metaphor for desire.', mood: 'Dreamlike' } },
+            ],
+            build: (v) => `You are a poet. Write a ${v.form} in ${v.voice} voice with a ${v.mood} mood. Theme: "${v.topic}". Use vivid imagery and musical language. Output ONLY the poem — no commentary.`
+        },
+        character: {
+            title: '🧑 Character',
+            fields: [
+                { id: 'concept', type: 'textarea', label: 'Concept', default: 'A cynical detective with a secret soft spot for jazz.' },
+                { id: 'depth', type: 'select', label: 'Depth', options: ['Quick sketch','Detailed profile','Full dossier with secrets'] },
+                { id: 'genre', type: 'select', label: 'Genre', options: ['Contemporary','Fantasy','Sci-Fi','Historical','Romance','Noir','Horror'] },
+            ],
+            chips: [
+                { label: '🕵️ noir detective', fill: { concept: 'A chain-smoking detective in 1940s LA with a haunted past.', genre: 'Noir' } },
+                { label: '🧝 elven princess', fill: { concept: 'An elven princess who ran away from court to become a thief.', genre: 'Fantasy' } },
+                { label: '🚀 starship captain', fill: { concept: 'A weary starship captain who lost her crew.', genre: 'Sci-Fi' } },
+                { label: '💋 femme fatale', fill: { concept: 'A nightclub singer who knows everyone\'s secrets.', genre: 'Romance' } },
+            ],
+            build: (v) => `You are a master character designer. Create a ${v.depth} for a ${v.genre} story. Include: name, age, appearance, personality, background, core desire, deepest fear, secret, contradictions, signature habit. Concept: "${v.concept}". Use clear headings.`
+        },
+        dialogue: {
+            title: '💬 Dialogue Scene',
+            fields: [
+                { id: 'setup', type: 'textarea', label: 'Scene', default: 'Two ex-lovers meet at a train station, both waiting for different trains.' },
+                { id: 'charA', type: 'input', label: 'Character A', default: 'Alex — guarded, dry humor, still in love' },
+                { id: 'charB', type: 'input', label: 'Character B', default: 'Sam — warm, honest, moved on (or has he?)' },
+                { id: 'mood', type: 'select', label: 'Mood', options: ['Tense','Tender','Bittersweet','Playful','Explosive','Sultry'] },
+            ],
+            chips: [
+                { label: '🚂 train station', fill: { setup: 'Two ex-lovers meet at a train station, both waiting for different trains.', mood: 'Bittersweet' } },
+                { label: '🍸 bar confession', fill: { setup: 'A confession at 2am in a nearly empty bar.', mood: 'Tense' } },
+                { label: '🚪 office confrontation', fill: { setup: 'A confrontation in a glass-walled office, everyone watching.', mood: 'Explosive' } },
+                { label: '🛏️ morning after', fill: { setup: 'The morning after, neither sure what it meant.', mood: 'Tender' } },
+            ],
+            build: (v) => `You are a screenwriter. Write a ${v.mood} dialogue scene.\n\nCharacter A: ${v.charA}\nCharacter B: ${v.charB}\n\nSetup: ${v.setup}\n\nUse mostly dialogue with minimal action beats. Let subtext carry weight. Output ONLY the scene.`
+        },
+        world: {
+            title: '🌍 World Builder',
+            fields: [
+                { id: 'concept', type: 'textarea', label: 'Concept', default: 'A floating city above an endless storm where memories are currency.' },
+                { id: 'genre', type: 'select', label: 'Genre', options: ['High Fantasy','Dark Fantasy','Sci-Fi','Cyberpunk','Steampunk','Post-Apocalyptic','Urban Fantasy','Historical'] },
+                { id: 'focus', type: 'select', label: 'Focus', options: ['Overview','Magic/Tech System','Politics & Factions','Geography','Culture & Customs','Religion & Myth'] },
+            ],
+            chips: [
+                { label: '🏙️ floating city', fill: { concept: 'A floating city above an endless storm where memories are currency.', genre: 'Dark Fantasy' } },
+                { label: '🌆 cyberpunk city', fill: { concept: 'A rain-slicked neon metropolis where dreams can be bought and sold.', genre: 'Cyberpunk' } },
+        { label: '⚔️ fallen kingdom', fill: { concept: 'A kingdom cursed to eternal winter after the queen\'s betrayal.', genre: 'High Fantasy' } },
+            ],
+            build: (v) => `You are a worldbuilding expert. Design a ${v.genre} world with focus on ${v.focus}. Concept: "${v.concept}". Include vivid sensory details, internal logic, conflicts, story hooks. Use clear headings and bullets.`
+        },
+        song: {
+            title: '🎵 Song Lyrics',
+            fields: [
+                { id: 'theme', type: 'textarea', label: 'Theme', default: 'A lover driving through the night to say goodbye.' },
+                { id: 'genre', type: 'select', label: 'Genre', options: ['Pop','Indie Folk','R&B','Rock Ballad','Country','Hip-Hop','Electronic','Jazz'] },
+                { id: 'structure', type: 'select', label: 'Structure', options: ['Verse / Chorus / Verse / Chorus / Bridge / Chorus','Verse / Chorus / Bridge','Two Verses + Chorus'] },
+                { id: 'mood', type: 'select', label: 'Mood', options: ['Heartbroken','Defiant','Euphoric','Nostalgic','Sultry','Hopeful'] },
+            ],
+            chips: [
+                { label: '🚗 midnight drive', fill: { theme: 'A lover driving through the night to say goodbye.', mood: 'Heartbroken', genre: 'Indie Folk' } },
+                { label: '💔 last call', fill: { theme: 'Closing time at a bar, one last drink before walking away.', mood: 'Nostalgic', genre: 'R&B' } },
+                { label: '🔥 burning love', fill: { theme: 'A love that consumes everything.', mood: 'Sultry', genre: 'Rock Ballad' } },
+            ],
+            build: (v) => `You are a songwriter. Write ${v.genre} lyrics with a ${v.mood} mood. Structure: ${v.structure}. Theme: "${v.theme}". Use concrete imagery. Label sections [Verse 1], [Chorus], etc. Output ONLY the lyrics.`
+        },
+        script: {
+            title: '🎬 Screenplay Scene',
+            fields: [
+                { id: 'scene', type: 'textarea', label: 'Scene Idea', default: 'A woman confronts her husband at a dinner party, in front of everyone.' },
+                { id: 'genre', type: 'select', label: 'Genre', options: ['Drama','Thriller','Romance','Comedy','Noir','Horror','Sci-Fi'] },
+                { id: 'length', type: 'select', label: 'Length', options: ['Short scene','Medium scene','Extended sequence'] },
+            ],
+            chips: [
+                { label: '🍽️ dinner confrontation', fill: { scene: 'A woman confronts her husband at a dinner party, in front of everyone.', genre: 'Drama' } },
+                { label: '🚗 car chase', fill: { scene: 'A car chase through rainy downtown streets.', genre: 'Thriller' } },
+                { label: '🌧️ first meeting', fill: { scene: 'Two people meet under an awning during a downpour.', genre: 'Romance' } },
+            ],
+            build: (v) => `You are a screenwriter. Write a ${v.genre} screenplay scene (${v.length}) in standard format. Include SLUG LINE, action description in present tense, character names in CAPS, and dialogue. Scene: "${v.scene}". Output ONLY the scene.`
+        },
+        idea: {
+            title: '💡 Brainstorm',
+            fields: [
+                { id: 'topic', type: 'textarea', label: 'Topic', default: 'Short story ideas about forbidden love.' },
+                { id: 'count', type: 'select', label: 'Number', options: ['5','10','15','20'] },
+                { id: 'style', type: 'select', label: 'Style', options: ['Logline + one paragraph','Logline only','Detailed pitch','Title + hook'] },
+            ],
+            chips: [
+                { label: '💔 forbidden love', fill: { topic: 'Short story ideas about forbidden love.' } },
+                { label: '🚀 sci-fi twists', fill: { topic: 'Sci-fi story ideas with a twist ending.' } },
+                { label: '🎭 unreliable narrators', fill: { topic: 'Stories with unreliable narrators.' } },
+                { label: '👻 haunted houses', fill: { topic: 'Fresh takes on haunted house stories.' } },
+            ],
+            build: (v) => `You are a creative director. Generate ${v.count} distinct, original ideas about: "${v.topic}". For each, provide a ${v.style}. Make them specific and non-generic. Number each idea.`
+        },
+        rewrite: {
+            title: '✏️ Rewrite',
+            fields: [
+                { id: 'text', type: 'textarea', label: 'Your text', placeholder: 'Paste the text you want to improve…' },
+                { id: 'goal', type: 'select', label: 'Goal', options: ['Improve prose flow','Make it more sensual','Make it darker','Make it funnier','Tighten (cut flab)','Expand with detail','Change POV','Change tone'] },
+                { id: 'preserve', type: 'select', label: 'Preserve', options: ['Meaning & plot','Just the vibe','Length approximately'] },
+            ],
+            chips: [
+                { label: '✨ more sensual', fill: { goal: 'Make it more sensual' } },
+                { label: '🌑 darker', fill: { goal: 'Make it darker' } },
+                { label: '✂️ tighten', fill: { goal: 'Tighten (cut flab)' } },
+                { label: '🔍 expand', fill: { goal: 'Expand with detail' } },
+            ],
+            build: (v) => `You are a master editor. Rewrite the text below with the goal: "${v.goal}". Preserve: "${v.preserve}". Output ONLY the rewritten text.\n\nORIGINAL:\n${v.text}`
+        },
+    };
+
+    function renderTab(tabKey) {
+        currentTab = tabKey;
+        const tab = TABS[tabKey];
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabKey));
+
+        let html = `<h2>${tab.title}</h2>`;
+        for (const f of tab.fields) {
+            html += `<div class="field">`;
+            html += `<label for="f_${f.id}">${f.label}</label>`;
+            if (f.type === 'textarea') {
+                html += `<textarea id="f_${f.id}" placeholder="${escAttr(f.placeholder||'')}">${escHtml(f.default||'')}</textarea>`;
+            } else if (f.type === 'input') {
+                html += `<input type="text" id="f_${f.id}" placeholder="${escAttr(f.placeholder||'')}" value="${escAttr(f.default||'')}">`;
+            } else if (f.type === 'select') {
+                html += `<select id="f_${f.id}">`;
+                for (const o of f.options) {
+                    const sel = (f.default === o) ? ' selected' : '';
+                    html += `<option${sel}>${escHtml(o)}</option>`;
+                }
+                html += `</select>`;
+            }
+            html += `</div>`;
+        }
+        if (tab.chips && tab.chips.length) {
+            html += `<div class="field"><label>Quick fill</label><div class="chip-row">`;
+            tab.chips.forEach((c, i) => {
+                html += `<span class="chip" data-chip="${i}">${escHtml(c.label)}</span>`;
+            });
+            html += `</div></div>`;
+        }
+        html += `<div class="btn-row">
+            <button class="btn primary" id="runBtn">✨ Generate</button>
+            <button class="btn ghost" id="resetBtn">↺ Reset</button>
+        </div>`;
+        inputPanel.innerHTML = html;
+
+        inputPanel.querySelectorAll('.chip').forEach(el => {
+            el.addEventListener('click', () => {
+                const c = tab.chips[+el.dataset.chip];
+                for (const [k, v] of Object.entries(c.fill || {})) {
+                    const field = document.getElementById('f_' + k);
+                    if (field) field.value = v;
+                }
+            });
+        });
+        document.getElementById('runBtn').addEventListener('click', runGeneration);
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            for (const f of tab.fields) {
+                const el = document.getElementById('f_' + f.id);
+                if (!el) continue;
+                if (f.type === 'select') el.selectedIndex = 0;
+                else el.value = f.default || '';
+            }
+            hideErr();
+        });
+    }
+
+    async function runGeneration() {
+        if (busy) return;
+        const key = apiKeyEl.value.trim();
+        if (!key) {
+            showErr('Paste your Gemini API key at the top. First time? Tap the link in the banner above.');
+            welcome.classList.remove('hidden');
+            return;
+        }
+
+        const tab = TABS[currentTab];
+        const values = {};
+        for (const f of tab.fields) {
+            const el = document.getElementById('f_' + f.id);
+            if (el) values[f.id] = el.value.trim();
+        }
+        const prompt = tab.build(values);
+        if (!prompt || prompt.length < 10) { showErr('Fill in the fields first.'); return; }
+
+        busy = true;
+        hideErr();
+        const runBtn = document.getElementById('runBtn');
+        const original = runBtn.innerHTML;
+        runBtn.innerHTML = '<span class="spinner"></span> Generating…';
+        runBtn.disabled = true;
+        output.classList.add('loading');
+        setHint('thinking…');
+
+        try {
+            const text = await callGemini(key, prompt);
+            lastOutput = text;
+            output.textContent = text;
+            output.classList.remove('loading');
+            setHint('done');
+            updateWordCount();
+        } catch (e) {
+            showErr(e.message);
+            setHint('error');
+            output.classList.remove('loading');
+        } finally {
+            busy = false;
+            runBtn.innerHTML = original;
+            runBtn.disabled = false;
+        }
+    }
+
+    async function callGemini(key, userText) {
+        const url = API_BASE + MODEL + ':generateContent?key=' + encodeURIComponent(key);
+        const body = {
+            contents: [{ parts: [{ text: userText }] }],
+            generationConfig: { temperature: 0.95, topP: 0.95, maxOutputTokens: 2048 },
+            safetySettings: [
+                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+            ]
+        };
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (!res.ok) {
+            const errText = await res.text();
+            let msg = 'HTTP ' + res.status;
+            try { const j = JSON.parse(errText); msg = j.error?.message || msg; } catch(e){}
+            if (res.status === 400 && msg.toLowerCase().includes('api key')) msg = 'Invalid API key. Get a new one at aistudio.google.com/app/apikey';
+            if (res.status === 403) msg = 'Key rejected (403). Enable Gemini API for this key in Google AI Studio.';
+            if (res.status === 429) msg = 'Rate limit reached. Wait a minute.';
+            throw new Error(msg);
+        }
+        const data = await res.json();
+        const cand = data?.candidates?.[0];
+        if (!cand) {
+            const r = data?.promptFeedback?.blockReason;
+            if (r) throw new Error('Prompt blocked (' + r + '). Try softer language.');
+            throw new Error('No response. Try again.');
+        }
+        if (cand.finishReason === 'SAFETY') throw new Error('Response blocked by safety filters.');
+        const parts = cand?.content?.parts || [];
+        const text = parts.map(p => p.text || '').join('').trim();
+        if (!text) throw new Error('Empty response. Try again.');
+        return text;
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function escAttr(s) { return escHtml(s); }
+
+    copyBtn.addEventListener('click', async () => {
+        if (!output.textContent) { showErr('Nothing to copy.'); return; }
+        try {
+            await navigator.clipboard.writeText(output.textContent);
+            const old = copyBtn.textContent;
+            copyBtn.textContent = '✓ Copied';
+            setTimeout(() => copyBtn.textContent = old, 1500);
+        } catch(e) { showErr('Clipboard blocked.'); }
+    });
+    clearBtn.addEventListener('click', () => {
+        if (output.textContent && !confirm('Clear the output?')) return;
+        output.textContent = '';
+        lastOutput = '';
+        setHint('ready');
+        wordCount.textContent = '';
+        hideErr();
+    });
+    shareBtn.addEventListener('click', async () => {
+        if (!output.textContent) { showErr('Nothing to share.'); return; }
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Creative Studio', text: output.textContent }); }
+            catch(e) {}
+        } else {
+            copyBtn.click();
+        }
+    });
+
+    tabsEl.addEventListener('click', (e) => {
+        const t = e.target.closest('.tab');
+        if (!t) return;
+        renderTab(t.dataset.tab);
+    });
+
+    renderTab('story');
+    setHint('ready');
+})();
+</script>
+</body>
+</html>
+```
+  
